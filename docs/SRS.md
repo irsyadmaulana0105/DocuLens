@@ -41,7 +41,7 @@ DocuLens memproses dokumen bisnis (fase MVP: **receipt dan invoice**) menjadi da
 ### 2.2 Asumsi & Batasan
 - Dokumen berupa PDF atau gambar; satu dokumen = satu invoice/receipt (multi-page boleh, maks. 10 halaman).
 - Bahasa utama: Indonesia dan Inggris.
-- LLM diakses via API (membutuhkan koneksi internet dan biaya per token).
+- LLM berjalan lokal lewat Ollama (tanpa biaya API); kecepatan bergantung pada perangkat keras pengembangan.
 - Data uji adalah dataset publik + data sintetis. **Tidak ada data pribadi nyata di repo.**
 - Dikembangkan solo; deploy target adalah Docker Compose lokal.
 
@@ -75,7 +75,7 @@ DocuLens memproses dokumen bisnis (fase MVP: **receipt dan invoice**) menjadi da
 | FR-24 | Sistem menghitung confidence per field dengan menggabungkan skor OCR, hasil validasi, dan konsistensi ekstraksi. | M |
 | FR-25 | Dokumen diarahkan: semua field ≥ threshold dan validasi lulus → `approved` (auto); selain itu → `needs_review`. Threshold dapat dikonfigurasi. | M |
 | FR-26 | Pemrosesan berjalan asinkron; kegagalan dicatat dan dapat di-retry. | M |
-| FR-27 | Sistem mencatat model, versi prompt, latensi, dan biaya token per dokumen. | S |
+| FR-27 | Sistem mencatat model, versi prompt, latensi, dan jumlah token per dokumen (serta biaya bila memakai provider berbayar). | S |
 
 ### 3.4 Review Manusia (HITL)
 | ID | Kebutuhan | Prioritas |
@@ -113,7 +113,7 @@ DocuLens memproses dokumen bisnis (fase MVP: **receipt dan invoice**) menjadi da
 
 | ID | Kategori | Kebutuhan | Target awal |
 |---|---|---|---|
-| NFR-01 | Performa | Waktu proses satu receipt 1 halaman | p95 < 30 detik |
+| NFR-01 | Performa | Waktu proses satu receipt 1 halaman | Ukur dan laporkan; target sementara p95 < 60 detik (field MVP) di laptop pengembangan, direvisi setelah baseline M1 |
 | NFR-02 | Performa | Respons pencarian | p95 < 2 detik |
 | NFR-03 | Keamanan | Password di-hash (bcrypt/argon2), JWT atau session aman, secret hanya di env | Wajib |
 | NFR-04 | Keamanan | Validasi file upload (tipe, ukuran), nama file disanitasi, tidak dieksekusi | Wajib |
@@ -123,7 +123,7 @@ DocuLens memproses dokumen bisnis (fase MVP: **receipt dan invoice**) menjadi da
 | NFR-08 | Keterbacaan kode | Linter + formatter (ruff, eslint/prettier) lolos di CI | Wajib |
 | NFR-09 | Pengujian | Unit test untuk validasi & confidence; integration test untuk alur upload → extract | Cakupan komponen inti ≥ 70% |
 | NFR-10 | Portabilitas | Seluruh sistem berjalan dengan `docker compose up` | Wajib |
-| NFR-11 | Biaya | Biaya LLM per dokumen dicatat dan dilaporkan | Wajib |
+| NFR-11 | Biaya & sumber daya | Jumlah token, latensi, dan spesifikasi perangkat keras dicatat dan dilaporkan (biaya bila memakai provider berbayar) | Wajib |
 | NFR-12 | Reproduktibilitas | Evaluasi memakai seed tetap dan konfigurasi tercatat | Wajib |
 
 ---
@@ -150,8 +150,7 @@ DocuLens memproses dokumen bisnis (fase MVP: **receipt dan invoice**) menjadi da
 Kontrak detail akan di-generate otomatis oleh FastAPI (`/docs`) dan menjadi sumber kebenaran setelah backend ada.
 
 ### 5.2 Layanan Eksternal
-- Anthropic API (ekstraksi dan jawaban RAG).
-- Model embedding (lokal atau API; keputusan di [decisions](decisions.md)).
+- Ollama (lokal) untuk ekstraksi, jawaban RAG, dan embedding (`bge-m3`). Provider lain dapat dipasang lewat interface `LLMClient` (lihat [decisions](decisions.md)).
 
 ---
 

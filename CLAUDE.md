@@ -9,11 +9,11 @@ DocuLens: sistem pemrosesan dokumen (receipt/invoice) end-to-end: upload → OCR
 - Skema DB: `docs/data-model.md`
 - Kontrak JSON ekstraksi: `docs/extraction-schema.md`
 - Evaluasi: `docs/evaluation-plan.md`
-- M1 - Baseline Pipeline: `docs/roadmap.md`
+- Milestone aktif & DoD: `docs/roadmap.md`
 - Keputusan teknis: `docs/decisions.md`
 
 ## Stack
-Python 3.11+, FastAPI, SQLAlchemy + Alembic, PostgreSQL + pgvector, PaddleOCR (baseline Tesseract), Anthropic API, Next.js (React, TypeScript), Docker Compose.
+Python 3.11+, FastAPI, SQLAlchemy + Alembic, PostgreSQL + pgvector, PaddleOCR (baseline Tesseract), Ollama (LLM lokal: hermes3, embedding bge-m3, VLM qwen2.5vl) lewat interface `LLMClient`, Next.js (React, TypeScript), Docker Compose.
 
 ## Perintah (perbarui saat sudah ada)
 ```
@@ -36,7 +36,8 @@ docker compose up --build
 7. Jangan hardcode secret; gunakan environment variable. Jangan commit `.env`, dataset, atau dokumen asli.
 8. Jangan menelan exception diam-diam; log dengan `document_id`.
 9. Pesan commit mengikuti Conventional Commits.
-10. Bila ragu atau kebutuhan ambigu, **tanya** — jangan menebak.
+10. LLM diakses hanya lewat interface `LLMClient` (provider-agnostic). Output LLM di-cache ke disk dengan kunci (dokumen, model, versi prompt). Model lokal lambat saat cold start, jadi gunakan `OLLAMA_KEEP_ALIVE` dan evaluasi pada subset dev dulu.
+11. Bila ragu atau kebutuhan ambigu, **tanya** — jangan menebak.
 
 ## Gaya Kode
 - Python: type hints wajib, ruff untuk lint/format, fungsi pendek.
@@ -44,4 +45,4 @@ docker compose up --build
 - Nama dalam bahasa Inggris; dokumen boleh Bahasa Indonesia.
 
 ## Status Saat Ini
-- Milestone aktif: **M0 — Fondasi**
+- Milestone aktif: **M1 — Baseline Pipeline tanpa UI**

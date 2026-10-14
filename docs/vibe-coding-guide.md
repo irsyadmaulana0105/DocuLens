@@ -59,3 +59,10 @@ dan hal yang melanggar arsitektur. Jangan menulis ulang, cukup daftar temuan.
 - [ ] Dokumen (SRS/README/decisions) sudah selaras dengan kode
 - [ ] Tidak ada secret/data sensitif di diff
 - [ ] Kamu bisa menjelaskan setiap bagian kode utama
+
+## Catatan untuk Model Lokal (Cline + Ollama)
+- Model 7B lokal sering kewalahan di alur agentic (banyak file sekaligus): lambat, lupa, atau mengarang isi file. Kerjakan **satu file / satu fungsi kecil per permintaan**.
+- Panaskan model sebelum mulai (`ollama run <model> "halo"`) dan set `OLLAMA_KEEP_ALIVE` agar tidak timeout saat cold start.
+- Jangan aktifkan auto-approve untuk Edit dan Commands.
+- **Selalu verifikasi dengan `git diff` di terminal**, bukan dari teks "diff" yang ditulis model di chat. Bila hasilnya salah: `git restore <file>`.
+- Hentikan model lain yang tidak dipakai (`ollama stop <model>`) agar RAM tidak berebut.

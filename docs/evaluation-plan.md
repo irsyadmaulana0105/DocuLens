@@ -24,14 +24,14 @@ Bagian ini yang membedakan proyek ini dari "demo upload PDF". Semua klaim di REA
 | Confidence | Expected Calibration Error (ECE), reliability diagram, AUROC "benar vs salah" |
 | HITL | % auto-approve, akurasi auto-approve, % field dikoreksi manusia |
 | RAG | Retrieval hit@k / MRR, faithfulness (jawaban didukung konteks), citation precision, tingkat penolakan benar saat tak ada bukti |
-| Sistem | Latensi p50/p95, biaya per dokumen |
+| Sistem | Latensi p50/p95, jumlah token per dokumen, spesifikasi perangkat keras |
 
 ## 4. Eksperimen
 
 | ID | Pertanyaan | Perbandingan | Output |
 |---|---|---|---|
 | E1 | OCR mana yang lebih baik? | Tesseract vs PaddleOCR | Tabel CER/WER |
-| E2 | Seberapa baik OCR + LLM mengekstrak field? | OCR+LLM (baseline); lalu LayoutLMv3 / Donut bila waktu cukup | Tabel F1 per field |
+| E2 | Seberapa baik OCR + LLM mengekstrak field? | (A) OCR + `hermes3` (baseline) vs (B) `qwen2.5vl:7b` langsung dari gambar | Tabel F1 per field + latensi |
 | E3 | Apakah confidence dapat dipercaya? | Sinyal tunggal vs gabungan (OCR + validasi + konsistensi) | ECE + reliability diagram |
 | E4 | Berapa kerja manual yang bisa dihemat? | Sapuan threshold 0.5 → 0.99 | Kurva: % auto-approve vs akurasi |
 | E5 | Apakah RAG jujur dan akurat? | Dengan vs tanpa reranker; dengan vs tanpa aturan "tolak bila tak ada bukti" | Tabel faithfulness & citation precision |
@@ -59,3 +59,11 @@ eval/
 3. Hasil (tabel/grafik)
 4. Analisis error (minimal 5 contoh kegagalan)
 5. Kesimpulan dan keterbatasan
+
+## 7. Caching Hasil LLM
+- Simpan output LLM di disk dengan kunci `hash(dokumen) + model + prompt_version` agar metrik dapat dihitung ulang tanpa memanggil LLM lagi.
+- Lakukan warm-up model sebelum mengukur latensi (cold start jauh lebih lambat) dan laporkan keduanya.
+
+## 8. Subset Dev
+- Karena inferensi lokal lambat, eksperimen awal memakai subset dev (±50-100 dokumen). Evaluasi penuh pada set test dijalankan sekali di akhir, setelah prompt dan threshold dibekukan.
+- LayoutLMv3 / Donut dipindahkan ke backlog.

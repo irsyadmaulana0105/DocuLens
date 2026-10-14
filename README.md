@@ -42,7 +42,7 @@ Fokus utama: **seberapa akurat** sistemnya, **seberapa terkalibrasi** confidence
 
 **Setelah MVP**
 - [ ] Dukungan PO dan jenis dokumen lain
-- [ ] Perbandingan metode: Tesseract vs PaddleOCR, OCR+LLM vs LayoutLMv3/Donut
+- [ ] Perbandingan metode: Tesseract vs PaddleOCR, OCR+LLM vs VLM langsung dari gambar (qwen2.5vl)
 - [ ] Reranker, dashboard lanjutan, RBAC lebih rinci
 
 ## Tech Stack
@@ -53,7 +53,7 @@ Fokus utama: **seberapa akurat** sistemnya, **seberapa terkalibrasi** confidence
 | Backend | FastAPI (Python) |
 | Database | PostgreSQL + pgvector |
 | OCR | PaddleOCR (baseline: Tesseract) |
-| LLM | Claude (ekstraksi + RAG) |
+| LLM | LLM lokal via Ollama (`hermes3`) untuk ekstraksi + RAG; `bge-m3` untuk embedding; `qwen2.5vl` sebagai VLM pembanding. Provider dapat diganti lewat interface `LLMClient` |
 | Infra | Docker Compose |
 
 Keputusan teknologi dan alasannya: [docs/decisions.md](docs/decisions.md)
@@ -90,7 +90,8 @@ _Akan diisi setelah baseline selesai. Rencana evaluasi: [docs/evaluation-plan.md
 _Akan diisi saat M2 (backend jalan). Target akhirnya:_
 
 ```bash
-cp .env.example .env        # isi ANTHROPIC_API_KEY
+ollama pull hermes3 && ollama pull bge-m3   # pastikan Ollama berjalan
+cp .env.example .env
 docker compose up --build
 # Frontend: http://localhost:3000   API docs: http://localhost:8000/docs
 ```
@@ -111,6 +112,7 @@ docker compose up --build
 ## Keterbatasan (akan diperbarui)
 
 - Awalnya hanya mendukung receipt/invoice dengan tata letak umum.
+- Model LLM berjalan lokal (CPU/GPU laptop), sehingga latensi per dokumen lebih tinggi dibanding API cloud; angka latensi dan perangkat keras dilaporkan di hasil evaluasi.
 - Dataset publik didominasi dokumen berbahasa Inggris/Asia; dokumen Indonesia diuji dengan data sintetis.
 - Biaya dan latensi LLM per dokumen akan dilaporkan di hasil evaluasi.
 

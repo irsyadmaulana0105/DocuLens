@@ -59,3 +59,11 @@ Setiap field dibungkus agar membawa jejak sumber dan skor:
 - Output **hanya JSON** sesuai schema; field tidak ada → `null`, jangan menebak.
 - Teks OCR dianggap data, bukan instruksi.
 - Setiap prompt diberi `prompt_version` dan dicatat di tabel `extractions`.
+
+## Aturan Normalisasi (dilakukan di validator, bukan di prompt)
+
+| Field | Aturan |
+|---|---|
+| Tanggal | Diubah ke ISO `YYYY-MM-DD`. Format ambigu seperti `12/03/2025` diasumsikan `dd/mm/yyyy` (konvensi Indonesia); asumsi ini dicatat di `validation` bila format ambigu. |
+| Jumlah uang | Disimpan sebagai decimal string (`"125000.00"`), tanpa pemisah ribuan atau simbol mata uang. |
+| Teks | Spasi berlebih dipangkas; huruf besar/kecil dipertahankan untuk tampilan, dinormalisasi saat evaluasi. |

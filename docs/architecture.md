@@ -20,7 +20,7 @@ flowchart TB
     end
     DB[(PostgreSQL<br/>+ pgvector)]
     FS[(File storage)]
-    LLM[[Claude API]]
+    LLM[[Ollama<br/>LLM lokal]]
 
     UI <--> API
     API --> DB
@@ -111,3 +111,10 @@ backend/app/
 - Upload: whitelist MIME + cek magic bytes, ukuran maks., nama file diganti UUID.
 - Prompt injection: teks OCR dianggap **data tidak tepercaya**; instruksi sistem dipisah dari konten dokumen, output LLM selalu divalidasi dengan schema.
 - Secret hanya lewat environment variable.
+
+## 8. LLM Client & Caching
+
+- Semua pemanggilan LLM lewat interface `LLMClient` (mis. `generate_json(prompt, schema) -> dict`). Implementasi awal: `OllamaClient`. Provider lain (Gemini, Groq, dll.) dapat ditambahkan tanpa mengubah pipeline.
+- Gunakan fitur structured output Ollama (parameter `format` berisi JSON schema dari Pydantic), `temperature=0`, lalu validasi ulang dengan Pydantic dan retry terbatas.
+- **Cache** setiap output LLM ke disk dengan kunci `hash(dokumen) + model + prompt_version`, sehingga evaluasi dapat diulang tanpa memanggil LLM lagi.
+- Pengukuran awal (model hangat, laptop pengembangan): prompt eval ±221 token/detik, generate ±12,7 token/detik. Tahap menulis output adalah bottleneck, jadi jaga output tetap ringkas (field MVP dulu, `line_items` belakangan).
