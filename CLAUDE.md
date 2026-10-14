@@ -9,7 +9,7 @@ DocuLens: sistem pemrosesan dokumen (receipt/invoice) end-to-end: upload → OCR
 - Skema DB: `docs/data-model.md`
 - Kontrak JSON ekstraksi: `docs/extraction-schema.md`
 - Evaluasi: `docs/evaluation-plan.md`
-- Milestone aktif & DoD: `docs/roadmap.md`
+- M1 - Baseline Pipeline: `docs/roadmap.md`
 - Keputusan teknis: `docs/decisions.md`
 
 ## Stack
