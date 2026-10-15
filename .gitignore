@@ -31,3 +31,5 @@ eval/outputs/
 .DS_Store
 .idea/
 .vscode/
+
+*.egg-info/
